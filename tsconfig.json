@@ -3,7 +3,7 @@
         "target": "es5",
         "module": "commonjs",
         "lib": ["esnext", "esnext.asynciterable"],
-        "sourceMap": true,
+        "declaration": true,
         "outDir": "./dist",
         "importHelpers": true,
         "downlevelIteration": true,

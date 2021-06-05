@@ -23,9 +23,7 @@ class Metasyntax {
         const tokens = this.metasyntax.split(/\s+/);
 
         tokens.forEach((token) => {
-            const pattern = token.slice(1, -1);
-
-            const matchers = pattern.split(/(?<!\\)\|/);
+            const matchers = token.slice(1, -1).split(/(?<!\\)\|/);
 
             if (token.startsWith("[") && token.endsWith("]")) {
             }
