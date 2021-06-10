@@ -67,7 +67,7 @@ Returns an array of parsed values from the target.
 This library comes with default typings that are extremely general but work well enough for both JavaScript and TypeScript users.
 
 However, `@cursorsdottsx/metasyntax` comes with a typings file that parses metasyntax using types to provide fine and accurate types for `Metasyntax`.
-This parser will obviously slow down your language server, so it is optional. To opt in, add `@cursorsdottsx/metasyntax/types.d.ts` to your `include` paths in your `tsconfig.json`.
+This parser will obviously slow down your language server, so it is optional. To opt in, add `../node_modules/@cursorsdottsx/metasyntax/types.d.ts` to your `include` paths in your `tsconfig.json`.
 
 If you are using the optional parser, please use `as const` with the options for finer types.
 
