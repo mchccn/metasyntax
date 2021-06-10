@@ -41,7 +41,7 @@ type ReturnValue<T> = T extends (...args: any) => infer R ? R : any
 type ResolveTypeInternal<T extends string, IsLast extends boolean, Options extends ParseOptions, InArray extends boolean = false, InAlias extends boolean = false> = 
     T extends keyof TypeMap
         ? TypeMap[T]
-        : T extends `${infer Type}[]`
+        : T extends `${infer Type}()`
             ? IsLast extends true
                 ? InArray extends true
                     ? { error: "SyntaxError: Array types can't be nested." }
@@ -76,20 +76,20 @@ type ResolveType<T extends string, IsLast extends boolean, Options extends Parse
 
 type ParseInternal<S extends string, Options extends ParseOptions, Results extends unknown[] = []> = 
     S extends `[${infer Types}]${infer Rest}`
-        ? ParseInternal<Trim<Rest>, Options, [...Results, ResolveType<Types, Rest extends "" ? true : false, Options>[number] | undefined]>
+        ? ParseInternal<Trim<Rest>, Options, [...Results, ResolveType<Types, Rest extends "" ? true : false, Options>[number] | undefined]> 
         : S extends `<${infer Types}>${infer Rest}`
-            ? ParseInternal<Trim<Rest>, Options, [...Results, ResolveType<Types, Rest extends "" ? true : false, Options>[number]]>
-            : S extends `\$${infer Rest}`
-                ? Options["$"] extends string
-                    ? ParseInternal<Trim<Rest>, Options, [...Results, Options["$"]]>
-                    : Options["$"] extends undefined | unknown
-                        ? ParseInternal<Trim<Rest>, Options, [...Results, { error: "TypeError: Special symbol '$' requires a value to be used." }]>
-                        : S extends ""
-                            ? Results
-                            : [...Results, { error: "SyntaxError: Invalid metasyntax." }]
-                : S extends ""
-                    ? Results
-                    : [...Results, { error: "TypeError: Option '$' must be of type string."}]
+        ? ParseInternal<Trim<Rest>, Options, [...Results, ResolveType<Types, Rest extends "" ? true : false, Options>[number]]>
+        : S extends `\$${infer Rest}`
+            ? Options["$"] extends string
+                ? ParseInternal<Trim<Rest>, Options, [...Results, Options["$"]]>
+                : Options["$"] extends undefined | unknown
+                    ? ParseInternal<Trim<Rest>, Options, [...Results, { error: "TypeError: Special symbol '$' requires a value to be used." }]>
+                    : S extends ""
+                        ? Results
+                        : [...Results, { error: "SyntaxError: Invalid metasyntax." }]
+            : S extends ""
+                ? Results
+                : [...Results, { error: "TypeError: Option '$' must be of type string."}]
 
 export type Parse<
     S extends string,
@@ -109,4 +109,18 @@ export type ParseOptions = {
     };
     readonly strict?: boolean;
     readonly partial?: boolean;
+    readonly case?: boolean;
+};
+
+export type AsyncParseOptions = {
+    readonly $?: string;
+    readonly types?: {
+        readonly [type: string]: RegExp | readonly [RegExp, (match: string) => unknown | Promise<unknown>];
+    };
+    readonly aliases?: {
+        readonly [alias: string]: string;
+    };
+    readonly strict?: boolean;
+    readonly partial?: boolean;
+    readonly case?: boolean;
 };
