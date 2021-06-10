@@ -82,7 +82,7 @@ new Metasyntax("[string] $ <number>", {
 new Metasyntax("[string] $ <number>").exec("'some string' dollar 1234");
 // => [string | undefined, {
 //        error: "TypeError: Special symbol '$' requires a value to be used."
-//    }, number]
+//    }, number] | undefined
 
 // The parser also works with all the other options, including `aliases` and `types`.
 ```
