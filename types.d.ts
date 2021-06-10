@@ -22,18 +22,18 @@ type TrimStart<T extends string> = T extends `${WhiteSpaceCharacter}${infer Rest
 type Trim<T extends string> = TrimEnd<TrimStart<T>>;
 
 type TypeMap = {
-    "string": string;
-    "number": number;
-    "boolean": boolean;
-    "date": Date;
-    "bigint": bigint;
-    "undefined": undefined;
-    "null": null;
-    "any": string;
-    "char": string;
-    "duration": number;
-    "integer": number;
-    "regex": RegExp;
+    string: string;
+    number: number;
+    boolean: boolean;
+    date: Date;
+    bigint: bigint;
+    undefined: undefined;
+    null: null;
+    any: string;
+    char: string;
+    duration: number;
+    integer: number;
+    regex: RegExp;
 };
 
 type ReturnValue<T> = T extends (...args: any) => infer R ? R : any
@@ -91,7 +91,7 @@ type ParseInternal<S extends string, Options extends ParseOptions, Results exten
                 ? Results
                 : [...Results, { error: "TypeError: Option '$' must be of type string."}]
 
-export type Parse<
+type Parse<
     S extends string,
     Options extends ParseOptions = {
         $: undefined;
@@ -99,7 +99,7 @@ export type Parse<
     }
 > = ParseInternal<Options["strict"] extends true ? Trim<S> : S, Options>;
 
-export type ParseOptions = {
+type ParseOptions = {
     readonly $?: string;
     readonly types?: {
         readonly [type: string]: RegExp | readonly [RegExp, (match: string) => unknown];
@@ -112,15 +112,26 @@ export type ParseOptions = {
     readonly case?: boolean;
 };
 
-export type AsyncParseOptions = {
-    readonly $?: string;
-    readonly types?: {
-        readonly [type: string]: RegExp | readonly [RegExp, (match: string) => unknown | Promise<unknown>];
-    };
-    readonly aliases?: {
-        readonly [alias: string]: string;
-    };
-    readonly strict?: boolean;
-    readonly partial?: boolean;
-    readonly case?: boolean;
-};
+declare module "@cursorsdottsx/metasyntax" {
+    export default class Metasyntax<Input extends string, Options extends ParseOptions> {
+        private static readonly types: { readonly [type: string]: RegExp };
+        private static readonly optionals: { readonly [type: string]: RegExp };
+
+        private metasyntax: Input;
+        private options?: Options;
+        private key: string[];
+        private parsed: RegExp;
+
+        constructor(metasyntax: Input, options?: Options | undefined);
+
+        exec(target: string): Parse<Input, Options> | undefined;
+        test(target: string): boolean;
+
+        get source(): Input;
+
+        private compile(): void;
+        private transform(): unknown;
+        private parse(): string;
+        private resolve(): string;
+    }
+}

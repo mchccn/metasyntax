@@ -1,9 +1,8 @@
 import escape from "./escape";
 import ms from "./ms";
 import regex from "./regex";
-import { Parse, ParseOptions } from "./types";
 
-class Metasyntax<Input extends string, Options extends ParseOptions> {
+class Metasyntax {
     private static readonly types = Object.fromEntries(Object.entries(regex).map(([type, regex]) => [type, new RegExp(`(${regex})`)]));
 
     private static readonly optionals = Object.fromEntries(Object.entries(regex).map(([type, regex]) => [type, new RegExp(`((?:${regex})(?:\\s+|$)|\\s*)`)]));
@@ -11,13 +10,27 @@ class Metasyntax<Input extends string, Options extends ParseOptions> {
     private key = [] as string[];
     private parsed!: RegExp;
 
-    constructor(private metasyntax: Input, private options?: Options) {
+    constructor(
+        private metasyntax: string,
+        private options?: {
+            readonly $?: string;
+            readonly types?: {
+                readonly [type: string]: RegExp | readonly [RegExp, (match: string) => unknown];
+            };
+            readonly aliases?: {
+                readonly [alias: string]: string;
+            };
+            readonly strict?: boolean;
+            readonly partial?: boolean;
+            readonly case?: boolean;
+        }
+    ) {
         if (!(this instanceof Metasyntax)) throw new Error("Class Metasyntax cannot be extended.");
 
         this.compile();
     }
 
-    public exec(target: string): Parse<Input, Options> | undefined {
+    public exec(target: string): unknown[] | undefined {
         const string = ((string) => {
             if (!this.options?.strict) string = string.trim();
 
@@ -48,7 +61,7 @@ class Metasyntax<Input extends string, Options extends ParseOptions> {
             }
 
             return this.transform(type, match);
-        }) as Parse<Input, Options>;
+        });
     }
 
     public test(target: string) {
@@ -159,7 +172,7 @@ class Metasyntax<Input extends string, Options extends ParseOptions> {
 
         if (type === "date") return new Date(match);
 
-        const defined = this.options?.types?.[type as keyof Metasyntax<Input, Options>["options"]];
+        const defined = this.options?.types?.[type as keyof Metasyntax["options"]];
 
         return Array.isArray(defined) ? defined[1](match) : match;
     }
@@ -198,7 +211,7 @@ class Metasyntax<Input extends string, Options extends ParseOptions> {
     }
 
     private resolve(type: string, optional: boolean, array?: boolean): string {
-        const defined = this.options?.types?.[type as keyof Metasyntax<Input, Options>["options"]];
+        const defined = this.options?.types?.[type as keyof Metasyntax["options"]];
 
         if (array) {
             const item = type.slice(0, -2);
