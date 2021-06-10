@@ -138,3 +138,7 @@ $
 -   Array types can't be nested (`type()()` is not allowed).
 
 -   Aliases cannot include other aliases to prevent an infinite loop.
+
+### Known bugs or issues
+
+-   The type `string()` has one issue; if a parsed string has a comma in it then the string will be split by the comma, giving incorrectly parsed results.

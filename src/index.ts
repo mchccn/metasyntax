@@ -52,7 +52,7 @@ class Metasyntax {
             if (type.endsWith("()")) {
                 const array = match
                     .split(/(?<!\\),/)
-                    .map((part) => this.transform(type.slice(0, -2), part.trim().replace(/\\,/g, ","))) //TODO: Change regex so it doesn't split commas in strings.
+                    .map((part) => this.transform(type.slice(0, -2), part.trim().replace(/\\,/g, ",")))
                     .filter(($) => typeof $ !== "undefined");
 
                 if (!array.length) return undefined;
