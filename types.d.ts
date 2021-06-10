@@ -78,18 +78,18 @@ type ParseInternal<S extends string, Options extends ParseOptions, Results exten
     S extends `[${infer Types}]${infer Rest}`
         ? ParseInternal<Trim<Rest>, Options, [...Results, ResolveType<Types, Rest extends "" ? true : false, Options>[number] | undefined]> 
         : S extends `<${infer Types}>${infer Rest}`
-        ? ParseInternal<Trim<Rest>, Options, [...Results, ResolveType<Types, Rest extends "" ? true : false, Options>[number]]>
-        : S extends `\$${infer Rest}`
-            ? Options["$"] extends string
-                ? ParseInternal<Trim<Rest>, Options, [...Results, Options["$"]]>
-                : Options["$"] extends undefined | unknown
-                    ? ParseInternal<Trim<Rest>, Options, [...Results, { error: "TypeError: Special symbol '$' requires a value to be used." }]>
-                    : S extends ""
-                        ? Results
-                        : [...Results, { error: "SyntaxError: Invalid metasyntax." }]
-            : S extends ""
-                ? Results
-                : [...Results, { error: "TypeError: Option '$' must be of type string."}]
+            ? ParseInternal<Trim<Rest>, Options, [...Results, ResolveType<Types, Rest extends "" ? true : false, Options>[number]]>
+            : S extends `\$${infer Rest}`
+                ? Options["$"] extends string
+                    ? ParseInternal<Trim<Rest>, Options, [...Results, Options["$"]]>
+                    : Options["$"] extends undefined | unknown
+                        ? ParseInternal<Trim<Rest>, Options, [...Results, { error: "TypeError: Special symbol '$' requires a value to be used." }]>
+                        : S extends ""
+                            ? Results
+                            : [...Results, { error: "SyntaxError: Invalid metasyntax." }]
+                : S extends ""
+                    ? Results
+                    : [...Results, { error: "TypeError: Option '$' must be of type string."}]
 
 type Parse<
     S extends string,
