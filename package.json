@@ -13,7 +13,6 @@
     },
     "devDependencies": {
         "@types/node": "^15.12.1",
-        "tslib": "^2.2.0",
         "typescript": "^4.3.2"
     },
     "keywords": [
@@ -26,5 +25,8 @@
     "bugs": {
         "url": "https://github.com/cursorsdottsx/metasyntax/issues"
     },
-    "homepage": "https://github.com/cursorsdottsx/metasyntax#readme"
+    "homepage": "https://github.com/cursorsdottsx/metasyntax#readme",
+    "dependencies": {
+        "tslib": "^2.3.1"
+    }
 }
