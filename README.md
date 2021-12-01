@@ -143,4 +143,5 @@ $
 
 ### Known bugs or issues
 
-None! If you know one, please submit an issue to get it fixed!
+- Array types are not available for aliases or custom types #2
+
