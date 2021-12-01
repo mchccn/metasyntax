@@ -110,6 +110,7 @@ type ParseOptions = {
     readonly strict?: boolean;
     readonly partial?: boolean;
     readonly case?: boolean;
+    readonly debug?: boolean;
 };
 
 declare module "@cursorsdottsx/metasyntax" {

@@ -1,7 +1,7 @@
 {
     "name": "@cursorsdottsx/metasyntax",
     "version": "1.0.2",
-    "description": "> Meta syntax parser in TypeScript.",
+    "description": "Metasyntax parser in TypeScript.",
     "main": "dist/index.js",
     "scripts": {
         "dev": "nodemon src/index.ts",

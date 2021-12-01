@@ -2,7 +2,7 @@
 
 <div align="center">
     <h2>@cursorsdottsx/metasyntax</h2>
-    <p>Meta syntax parser in TypeScript.</p>
+    <p>Metasyntax parser in TypeScript.</p>
     <img src="https://forthebadge.com/images/badges/fuck-it-ship-it.svg" />
     <img src="https://forthebadge.com/images/badges/made-with-typescript.svg" />
     <img src="https://forthebadge.com/images/badges/powered-by-black-magic.svg" />
@@ -67,7 +67,9 @@ Returns an array of parsed values from the target.
 This library comes with default typings that are extremely general but work well enough for both JavaScript and TypeScript users.
 
 However, `@cursorsdottsx/metasyntax` comes with a typings file that parses metasyntax using types to provide fine and accurate types for `Metasyntax`.
-This parser will obviously slow down your language server, so it is optional. To opt in, add `../node_modules/@cursorsdottsx/metasyntax/types.d.ts` to your `include` paths in your `tsconfig.json`.
+This parser will obviously slow down your language server, so it is optional. To opt in, add `./node_modules/@cursorsdottsx/metasyntax/types.d.ts` to your `include` paths in your `tsconfig.json`.
+You can also fiddle with the `typings` and `typeRoots` options if the above does not work.
+Finally, if all has failed, there is still the triple-slash directive to reference it.
 
 If you are using the optional parser, please use `as const` with the options for finer types.
 
@@ -141,4 +143,4 @@ $
 
 ### Known bugs or issues
 
--   The type `string()` has one issue; if a parsed string has a comma in it then the string will be split by the comma, giving incorrectly parsed results.
+None! If you know one, please submit an issue to get it fixed!

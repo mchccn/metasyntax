@@ -23,11 +23,14 @@ class Metasyntax {
             readonly strict?: boolean;
             readonly partial?: boolean;
             readonly case?: boolean;
+            readonly debug?: boolean;
         }
     ) {
         if (!(this instanceof Metasyntax)) throw new Error("Class Metasyntax cannot be extended.");
 
         this.compile();
+
+        if (options?.debug) console.log("[metasyntax] Compiled regex:", this.parsed);
     }
 
     public exec(target: string): unknown[] | undefined {
@@ -51,8 +54,9 @@ class Metasyntax {
 
             if (type.endsWith("()")) {
                 const array = match
-                    .split(/(?<!\\),/)
+                    .split(type.startsWith("string") ? /(?<=('|"))\s*,\s*(?=('|"))/ : /(?<!\\),/)
                     .map((part) => this.transform(type.slice(0, -2), part.trim().replace(/\\,/g, ",")))
+                    .filter((s) => (type.startsWith("string") ? s !== "" : true))
                     .filter(($) => typeof $ !== "undefined");
 
                 if (!array.length) return undefined;
@@ -102,11 +106,23 @@ class Metasyntax {
 
             if (!(token.startsWith("[") && token.endsWith("]")) && !(token.startsWith("<") && token.endsWith(">"))) {
                 if (token.startsWith("[") || token.startsWith("<"))
-                    throw new SyntaxError(`Invalid metasyntax.\nIn token '${token} '\n${" ".repeat("In token ".length + token.length + 1)}^ Expected closing '${token.startsWith("[") ? "]" : ">"}'.`);
+                    throw new SyntaxError(
+                        `Invalid metasyntax.\nIn token '${token} '\n${" ".repeat("In token ".length + token.length + 1)}^ Expected closing '${
+                            token.startsWith("[") ? "]" : ">"
+                        }'.`
+                    );
                 if (token.endsWith("]") || token.endsWith(">"))
-                    throw new SyntaxError(`Invalid metasyntax.\nIn token ' ${token}'\n${" ".repeat("In token ".length + 1)}^ Expected opening '${token.endsWith("]") ? "[" : "<"}'.`);
+                    throw new SyntaxError(
+                        `Invalid metasyntax.\nIn token ' ${token}'\n${" ".repeat("In token ".length + 1)}^ Expected opening '${
+                            token.endsWith("]") ? "[" : "<"
+                        }'.`
+                    );
 
-                throw new SyntaxError(`Invalid metasyntax.\nIn token ' ${token} '\n${" ".repeat("In token".length + 1 + 1)}^${" ".repeat(token.length)}^ Expected opening and closing '[]' or '<>'.`);
+                throw new SyntaxError(
+                    `Invalid metasyntax.\nIn token ' ${token} '\n${" ".repeat("In token".length + 1 + 1)}^${" ".repeat(
+                        token.length
+                    )}^ Expected opening and closing '[]' or '<>'.`
+                );
             }
 
             return {
@@ -120,7 +136,7 @@ class Metasyntax {
 
                         return this.parse(type, optional, isLast);
                     })
-                    .join("|")})`,
+                    .join("|")})${optional ? "?" : ""}`,
             };
         });
 
@@ -137,7 +153,7 @@ class Metasyntax {
             ""
         );
 
-        this.parsed = new RegExp(this.options?.partial ? joined : `^${joined}$`, "g");
+        this.parsed = new RegExp(this.options?.partial ? joined : `^${joined}$`);
     }
 
     private transform(type: string, match: string) {
@@ -178,7 +194,8 @@ class Metasyntax {
     }
 
     private parse(type: string, optional: boolean, isLast: boolean, alias?: boolean) {
-        if (this.options?.aliases?.[type] && alias) throw new ReferenceError(`Aliases cannot be included in another alias.\nAlias '${type}' is included in another alias.`);
+        if (this.options?.aliases?.[type] && alias)
+            throw new ReferenceError(`Aliases cannot be included in another alias.\nAlias '${type}' is included in another alias.`);
 
         if ((type.startsWith("'") && type.endsWith("'")) || (type.startsWith('"') && type.endsWith('"'))) {
             this.key.push("string");
@@ -203,7 +220,8 @@ class Metasyntax {
             return this.resolve(type, optional, true);
         }
 
-        if (!Metasyntax.types[type as keyof typeof Metasyntax.types] && !Object.keys(this.options?.types ?? {}).includes(type)) throw new TypeError(`Unknown type '${type}'.`);
+        if (!Metasyntax.types[type as keyof typeof Metasyntax.types] && !Object.keys(this.options?.types ?? {}).includes(type))
+            throw new TypeError(`Unknown type '${type}'.`);
 
         this.key.push(type);
 
@@ -229,7 +247,9 @@ class Metasyntax {
 
         return (
             Metasyntax[optional ? "optionals" : "types"][type as keyof typeof Metasyntax.types]?.source ??
-            (Array.isArray(defined) ? defined[0].source : (defined as RegExp)?.source) ??
+            (optional
+                ? `((?:${Array.isArray(defined) ? defined[0].source : (defined as RegExp)?.source})(?:\\s+|$)|\\s*)`
+                : `(${Array.isArray(defined) ? defined[0].source : (defined as RegExp)?.source})`) ??
             (() => {
                 throw new ReferenceError("Type was asserted as defined but couldn't be found.");
             })()
